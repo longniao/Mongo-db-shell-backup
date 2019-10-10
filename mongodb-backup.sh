@@ -14,6 +14,7 @@ HOST="localhost"
 PORT="27017" # default mongoDb port is 27017
 USERNAME=""
 PASSWORD=""
+DBNAME=""
 
 # Set where database backups will be stored
 # keyword DATE gets replaced by the current date, you can use it in either path below
@@ -50,10 +51,14 @@ if [ -d "$BACKUP_PATH" ]; then
 	echo; echo "=> Backing up Mongo Server: $HOST:$PORT"; echo -n '   ';
 	
 	# run dump on mongoDB
-	if [ "$USERNAME" != "" -a "$PASSWORD" != "" ]; then 
-		$MONGO_DUMP_BIN_PATH --host $HOST:$PORT -u $USERNAME -p $PASSWORD --out $TMP_BACKUP_DIR >> /dev/null
+    DBPARAM=""
+	if [ "$DBNAME" != "" ]; then
+        DBPARAM=" -d $DBNAME"
+	fi
+	if [ "$USERNAME" != "" -a "$PASSWORD" != "" ]; then
+		$MONGO_DUMP_BIN_PATH --host $HOST:$PORT -u $USERNAME -p $PASSWORD $DBPARAM --out $TMP_BACKUP_DIR >> /dev/null
 	else 
-		$MONGO_DUMP_BIN_PATH --host $HOST:$PORT --out $TMP_BACKUP_DIR >> /dev/null
+		$MONGO_DUMP_BIN_PATH --host $HOST:$PORT $DBPARAM --out $TMP_BACKUP_DIR >> /dev/null
 	fi
 	
 	# check to see if mongoDb was dumped correctly
